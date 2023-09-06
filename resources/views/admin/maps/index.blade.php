@@ -1,299 +1,194 @@
 @extends('admin.layouts.app')
+@section('title')
+{{ $title }}
+@endsection
+
+@section('breadcrumbs')
+{{ Breadcrumbs::render() }}
+@endsection
 @section('content')
-<div class="flex flex-wrap">
-    <div class="w-full md:w-1/2 xl:w-1/3 p-3">
-        <!--Metric Card-->
-        <div class="bg-white border rounded shadow p-2">
-            <div class="flex flex-row items-center">
-                <div class="flex-shrink pr-4">
-                    <div class="rounded p-3 bg-green-600"><i class="fa fa-wallet fa-2x fa-fw fa-inverse"></i></div>
-                </div>
-                <div class="flex-1 text-right md:text-center">
-                    <h5 class="font-bold uppercase text-gray-500">Total Revenue</h5>
-                    <h3 class="font-bold text-3xl">$3249 <span class="text-green-500"><i
-                                class="fas fa-caret-up"></i></span></h3>
+@push('css')
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
+<link href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.tailwindcss.min.css" />
+@endpush
+<section>
+    <div class="flex flex-row flex-wrap flex-grow p-2">
+        <div class="w-full p-3">
+            <!--Table Card-->
+            <div class="card w-full bg-base-100 shadow-xl">
+                <div class="card-body">
+                    <div class="flex justify-between items-center">
+                        <h2 class="card-title"> Maps</h2>
+                    </div>
+                    <div id="map" class="rounded-lg" style="width: 100%; height: 450px;"></div>
                 </div>
             </div>
+            <!--/table Card-->
         </div>
-        <!--/Metric Card-->
     </div>
-    <div class="w-full md:w-1/2 xl:w-1/3 p-3">
-        <!--Metric Card-->
-        <div class="bg-white border rounded shadow p-2">
-            <div class="flex flex-row items-center">
-                <div class="flex-shrink pr-4">
-                    <div class="rounded p-3 bg-pink-600"><i class="fas fa-users fa-2x fa-fw fa-inverse"></i>
+</section>
+<section>
+    <div class="flex flex-row flex-wrap flex-grow p-2">
+        <div class="w-full p-3">
+            <!--Table Card-->
+            <div class="card w-full bg-base-100 shadow-xl  mb-11">
+                <div class="card-body">
+                    <div class="flex justify-between items-center">
+                        <h2 class="card-title">Data Maps</h2>
+                        <a href="{{ route('maps.create') }}" class="ml-auto btn btn-accent btn-sm">Add Mark</a>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="table">
+                            <!-- head -->
+                            <thead>
+                                <tr>
+                                    <th>Mark</th>
+                                    <th>Description</th>
+                                    <th>Latitude</th>
+                                    <th>Longitude</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($maps as $map)
+                                <tr>
+                                    <td>
+                                        <div class="flex items-center space-x-3">
+                                            <div class="avatar">
+                                                <div class="mask mask-squircle w-12 h-12">
+                                                    <img src="{{asset('assets/image/mark/thumbnail/mark_'.$map->image) }}"
+                                                        alt="Mark image" />
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <div class="font-bold">{{$map->title}}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {{$map->description}}
+                                    </td>
+                                    <td>{{$map->lat}}</td>
+                                    <td>{{$map->lng}}</td>
+                                    <th>
+                                        <div class="flex gap-2">
+                                            <button class="btn btn-outline btn-info btn-xs">details</button>
+                                            <button class="btn btn-outline btn-warning btn-xs">edit</button>
+                                            <button class="btn btn-outline btn-error btn-xs">delete</button>
+                                        </div>
+                                    </th>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-                <div class="flex-1 text-right md:text-center">
-                    <h5 class="font-bold uppercase text-gray-500">Total Users</h5>
-                    <h3 class="font-bold text-3xl">249 <span class="text-pink-500"><i
-                                class="fas fa-exchange-alt"></i></span></h3>
-                </div>
             </div>
+            <!--/table Card-->
         </div>
-        <!--/Metric Card-->
     </div>
-    <div class="w-full md:w-1/2 xl:w-1/3 p-3">
-        <!--Metric Card-->
-        <div class="bg-white border rounded shadow p-2">
-            <div class="flex flex-row items-center">
-                <div class="flex-shrink pr-4">
-                    <div class="rounded p-3 bg-yellow-600"><i class="fas fa-user-plus fa-2x fa-fw fa-inverse"></i></div>
-                </div>
-                <div class="flex-1 text-right md:text-center">
-                    <h5 class="font-bold uppercase text-gray-500">New Users</h5>
-                    <h3 class="font-bold text-3xl">2 <span class="text-yellow-600"><i
-                                class="fas fa-caret-up"></i></span></h3>
-                </div>
-            </div>
-        </div>
-        <!--/Metric Card-->
-    </div>
-    <div class="w-full md:w-1/2 xl:w-1/3 p-3">
-        <!--Metric Card-->
-        <div class="bg-white border rounded shadow p-2">
-            <div class="flex flex-row items-center">
-                <div class="flex-shrink pr-4">
-                    <div class="rounded p-3 bg-blue-600"><i class="fas fa-server fa-2x fa-fw fa-inverse"></i></div>
-                </div>
-                <div class="flex-1 text-right md:text-center">
-                    <h5 class="font-bold uppercase text-gray-500">Server Uptime</h5>
-                    <h3 class="font-bold text-3xl">152 days</h3>
-                </div>
-            </div>
-        </div>
-        <!--/Metric Card-->
-    </div>
-    <div class="w-full md:w-1/2 xl:w-1/3 p-3">
-        <!--Metric Card-->
-        <div class="bg-white border rounded shadow p-2">
-            <div class="flex flex-row items-center">
-                <div class="flex-shrink pr-4">
-                    <div class="rounded p-3 bg-indigo-600"><i class="fas fa-tasks fa-2x fa-fw fa-inverse"></i></div>
-                </div>
-                <div class="flex-1 text-right md:text-center">
-                    <h5 class="font-bold uppercase text-gray-500">To Do List</h5>
-                    <h3 class="font-bold text-3xl">7 tasks</h3>
-                </div>
-            </div>
-        </div>
-        <!--/Metric Card-->
-    </div>
-    <div class="w-full md:w-1/2 xl:w-1/3 p-3">
-        <!--Metric Card-->
-        <div class="bg-white border rounded shadow p-2">
-            <div class="flex flex-row items-center">
-                <div class="flex-shrink pr-4">
-                    <div class="rounded p-3 bg-red-600"><i class="fas fa-inbox fa-2x fa-fw fa-inverse"></i>
-                    </div>
-                </div>
-                <div class="flex-1 text-right md:text-center">
-                    <h5 class="font-bold uppercase text-gray-500">Issues</h5>
-                    <h3 class="font-bold text-3xl">3 <span class="text-red-500"><i class="fas fa-caret-up"></i></span>
-                    </h3>
-                </div>
-            </div>
-        </div>
-        <!--/Metric Card-->
-    </div>
-</div>
-
-<!--Divider-->
-<hr class="border-b-2 border-gray-400 my-8 mx-4">
-
-<div class="flex flex-row flex-wrap flex-grow mt-2">
-
-    <div class="w-full md:w-1/2 p-3">
-        <!--Graph Card-->
-        <div class="bg-white border rounded shadow">
-            <div class="border-b p-3">
-                <h5 class="font-bold uppercase text-gray-600">Graph</h5>
-            </div>
-            <div class="p-5">
-                <canvas id="chartjs-7" class="chartjs" width="undefined" height="undefined"></canvas>
-                <script>
-                    new Chart(document.getElementById("chartjs-7"), {
-                    "type": "bar",
-                    "data": {
-                        "labels": ["January", "February", "March", "April"],
-                        "datasets": [{
-                            "label": "Page Impressions",
-                            "data": [10, 20, 30, 40],
-                            "borderColor": "rgb(255, 99, 132)",
-                            "backgroundColor": "rgba(255, 99, 132, 0.2)"
-                        }, {
-                            "label": "Adsense Clicks",
-                            "data": [5, 15, 10, 30],
-                            "type": "line",
-                            "fill": false,
-                            "borderColor": "rgb(54, 162, 235)"
-                        }]
-                    },
-                    "options": {
-                        "scales": {
-                            "yAxes": [{
-                                "ticks": {
-                                    "beginAtZero": true
-                                }
-                            }]
-                        }
-                    }
-                });
-                </script>
-            </div>
-        </div>
-        <!--/Graph Card-->
-    </div>
-
-    <div class="w-full md:w-1/2 p-3">
-        <!--Graph Card-->
-        <div class="bg-white border rounded shadow">
-            <div class="border-b p-3">
-                <h5 class="font-bold uppercase text-gray-600">Graph</h5>
-            </div>
-            <div class="p-5">
-                <canvas id="chartjs-0" class="chartjs" width="undefined" height="undefined"></canvas>
-                <script>
-                    new Chart(document.getElementById("chartjs-0"), {
-                    "type": "line",
-                    "data": {
-                        "labels": ["January", "February", "March", "April", "May", "June", "July"],
-                        "datasets": [{
-                            "label": "Views",
-                            "data": [65, 59, 80, 81, 56, 55, 40],
-                            "fill": false,
-                            "borderColor": "rgb(75, 192, 192)",
-                            "lineTension": 0.1
-                        }]
-                    },
-                    "options": {}
-                });
-                </script>
-            </div>
-        </div>
-        <!--/Graph Card-->
-    </div>
-
-    <div class="w-full md:w-1/2 xl:w-1/3 p-3">
-        <!--Graph Card-->
-        <div class="bg-white border rounded shadow">
-            <div class="border-b p-3">
-                <h5 class="font-bold uppercase text-gray-600">Graph</h5>
-            </div>
-            <div class="p-5">
-                <canvas id="chartjs-1" class="chartjs" width="undefined" height="undefined"></canvas>
-                <script>
-                    new Chart(document.getElementById("chartjs-1"), {
-                    "type": "bar",
-                    "data": {
-                        "labels": ["January", "February", "March", "April", "May", "June", "July"],
-                        "datasets": [{
-                            "label": "Likes",
-                            "data": [65, 59, 80, 81, 56, 55, 40],
-                            "fill": false,
-                            "backgroundColor": ["rgba(255, 99, 132, 0.2)", "rgba(255, 159, 64, 0.2)", "rgba(255, 205, 86, 0.2)", "rgba(75, 192, 192, 0.2)", "rgba(54, 162, 235, 0.2)", "rgba(153, 102, 255, 0.2)", "rgba(201, 203, 207, 0.2)"],
-                            "borderColor": ["rgb(255, 99, 132)", "rgb(255, 159, 64)", "rgb(255, 205, 86)", "rgb(75, 192, 192)", "rgb(54, 162, 235)", "rgb(153, 102, 255)", "rgb(201, 203, 207)"],
-                            "borderWidth": 1
-                        }]
-                    },
-                    "options": {
-                        "scales": {
-                            "yAxes": [{
-                                "ticks": {
-                                    "beginAtZero": true
-                                }
-                            }]
-                        }
-                    }
-                });
-                </script>
-            </div>
-        </div>
-        <!--/Graph Card-->
-    </div>
-
-    <div class="w-full md:w-1/2 xl:w-1/3 p-3">
-        <!--Graph Card-->
-        <div class="bg-white border rounded shadow">
-            <div class="border-b p-3">
-                <h5 class="font-bold uppercase text-gray-600">Graph</h5>
-            </div>
-            <div class="p-5"><canvas id="chartjs-4" class="chartjs" width="undefined" height="undefined"></canvas>
-                <script>
-                    new Chart(document.getElementById("chartjs-4"), {
-                    "type": "doughnut",
-                    "data": {
-                        "labels": ["P1", "P2", "P3"],
-                        "datasets": [{
-                            "label": "Issues",
-                            "data": [300, 50, 100],
-                            "backgroundColor": ["rgb(255, 99, 132)", "rgb(54, 162, 235)", "rgb(255, 205, 86)"]
-                        }]
-                    }
-                });
-                </script>
-            </div>
-        </div>
-        <!--/Graph Card-->
-    </div>
-
-    <div class="w-full md:w-1/2 xl:w-1/3 p-3">
-        <!--Template Card-->
-        <div class="bg-white border rounded shadow">
-            <div class="border-b p-3">
-                <h5 class="font-bold uppercase text-gray-600">Template</h5>
-            </div>
-            <div class="p-5">
-
-            </div>
-        </div>
-        <!--/Template Card-->
-    </div>
-
-    <div class="w-full p-3">
-        <!--Table Card-->
-        <div class="bg-white border rounded shadow">
-            <div class="border-b p-3">
-                <h5 class="font-bold uppercase text-gray-600">Table</h5>
-            </div>
-            <div class="p-5">
-                <table class="w-full p-5 text-gray-700">
-                    <thead>
-                        <tr>
-                            <th class="text-left text-blue-900">Name</th>
-                            <th class="text-left text-blue-900">Side</th>
-                            <th class="text-left text-blue-900">Role</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                        <tr>
-                            <td>Obi Wan Kenobi</td>
-                            <td>Light</td>
-                            <td>Jedi</td>
-                        </tr>
-                        <tr>
-                            <td>Greedo</td>
-                            <td>South</td>
-                            <td>Scumbag</td>
-                        </tr>
-                        <tr>
-                            <td>Darth Vader</td>
-                            <td>Dark</td>
-                            <td>Sith</td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <p class="py-2"><a href="#">See More issues...</a></p>
-
-            </div>
-        </div>
-        <!--/table Card-->
-    </div>
-
-
-</div>
+</section>
 
 @endsection
+@push('js')
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.0/jquery.validate.js"></script>
+<script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src='https://unpkg.com/leaflet-control-geocoder@2.4.0/dist/Control.Geocoder.js'></script>
+<script src="https://cdn.jsdelivr.net/npm/leaflet-search@3.0.9/dist/leaflet-search.src.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/leaflet.fullscreen@2.4.0/Control.FullScreen.min.js"></script>
+
+<script>
+    let map, markers = [];
+    /* ----------------------------- Initialize Map ----------------------------- */
+    function initMap() {
+        map = L.map('map', {
+            center: {
+                lat: 0.4888556,
+                lng: 101.4548226,
+            },
+            zoom: 10
+        });
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+
+        map.on('click', mapClicked);
+        fetchMapData().then(data => {
+            initMarkers(data);
+        });
+    }
+    initMap();
+
+    /* --------------------------- Initialize Markers --------------------------- */
+    function initMarkers(data) {
+        for (let index = 0; index < data.length; index++) {
+            const markerData = data[index];
+            const marker = generateMarker(markerData, index);
+            marker.addTo(map).bindPopup(`
+            <figure class="px-0 pt-0">
+                    <img src="assets/image/mark/thumbnail/mark_${markerData.position.image}" alt="Shoes" class="rounded-xl" />
+                </figure>
+                <h2 class="card-title">${markerData.position.title}</h2>
+                    <p>${markerData.position.description}</p>
+            `);
+            map.panTo(markerData.position);
+            markers.push(marker);
+        }
+    }
+
+    function generateMarker(data, index) {
+        return L.marker(data.position, {
+            draggable: data.draggable
+        })
+            .on('click', (event) => markerClicked(event, index))
+            .on('dragend', (event) => markerDragEnd(event, index));
+    }
+
+    /* ------------------------- Handle Map Click Event ------------------------- */
+    function mapClicked($event) {
+        console.log(map);
+        console.log($event.latlng.lat, $event.latlng.lng);
+    }
+
+    /* ------------------------ Handle Marker Click Event ----------------------- */
+    function markerClicked($event, index) {
+        console.log(map);
+        console.log($event.latlng.lat, $event.latlng.lng);
+    }
+
+    /* ----------------------- Handle Marker DragEnd Event ---------------------- */
+    function markerDragEnd($event, index) {
+        console.log(map);
+        console.log($event.target.getLatLng());
+    }
+
+    /* ----------------------------- Fetch Map Data ----------------------------- */
+    function fetchMapData() {
+        return fetch('/api/maps') // Ganti dengan URL yang sesuai dengan rute API Anda.
+            .then(response => response.json())
+            .then(data => {
+                return data.data.initialMarkers.position;
+            })
+            .catch(error => {
+                console.error('Gagal mengambil data peta:', error);
+            });
+    }
+</script>
+
+<script type="text/javascript">
+    function confirmDelete() {
+        if (!confirm("Are You Sure to delete this"))
+            event.preventDefault();
+    }
+</script>
+
+
+@endpush

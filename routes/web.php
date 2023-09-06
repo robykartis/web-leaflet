@@ -26,6 +26,11 @@ Route::controller(AuthController::class)->group(function () {
     Route::get('/logout', 'logout')->name('logout');
 });
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
 Route::controller(MapsController::class)->group(function () {
-    Route::get('/', 'public_index')->name('home');
+    Route::get('/', 'public_maps')->name('home');
+    Route::get('/api/maps', 'get_maps');
+    Route::get('/maps', 'index')->name('maps.index');
+    Route::get('/maps/create', 'create')->name('maps.create');
+    Route::post('/maps/store', 'store')->name('maps.store');
 });
