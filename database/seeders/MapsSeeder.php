@@ -31,5 +31,23 @@ class MapsSeeder extends Seeder
             'lat' => '0.4851844',
             'lng' => '101.409964'
         ]);
+        Maps::create([
+            'title' => 'Pasar Bawah',
+            'description' => 'test pasar bawah',
+            'lat' => '0.5270466',
+            'lng' => '101.4577712'
+        ]);
+        Maps::create([
+            'title' => 'Mal Ciputra Seraya',
+            'description' => 'test mal ciputra seraya',
+            'lat' => '0.5270466',
+            'lng' => '101.4577712'
+        ]);
+        Maps::create([
+            'title' => 'RSUD Arifin Achmad Provinsi Riau',
+            'description' => 'test RSUD Arifin Achmad Provinsi Riau',
+            'lat' => '0.5270466',
+            'lng' => '101.4577712'
+        ]);
     }
 }

@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title> @yield('title') | {{config('app.name', 'Maps')}}</title>
+    <title> @yield('title') | {{ config('app.name', 'Maps') }}</title>
     <meta name="description" content="description here">
     <meta name="keywords" content="keywords,here">
 
@@ -21,7 +21,7 @@
 
     @include('admin.layouts.include.nav')
     <!--Container-->
-    <div class="container w-full mx-auto ">
+    <div class="container w-full mx-auto mb-8">
         <div class="text-sm breadcrumbs px-3 sm:px-2 md:px-2">
             @yield('breadcrumbs')
         </div>

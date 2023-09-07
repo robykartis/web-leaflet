@@ -23,6 +23,7 @@ class MapsController extends Controller
         foreach ($maps as $map) {
             $initialMarkers[] = [
                 'position' => [
+                    'id' => $map['id'],
                     'lat' => $map['lat'],
                     'lng' => $map['lng'],
                     'title' => $map['title'],
@@ -42,15 +43,63 @@ class MapsController extends Controller
             ]
         ]);
     }
+    public function get_map_by_id(Request $request, $id)
+    {
+        // Mengambil data peta berdasarkan ID
+        $map = Maps::find($id);
+
+        // Memeriksa apakah peta dengan ID tersebut ditemukan
+        if (!$map) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Peta tidak ditemukan.'
+            ], 404); // Mengembalikan respons 404 jika peta tidak ditemukan
+        }
+
+        // Mengubah data peta menjadi format yang diinginkan
+        $mapData = [
+            'position' => [
+                'lat' => $map->lat,
+                'lng' => $map->lng,
+                'title' => $map->title,
+                'description' => $map->description,
+                'image' => $map->image
+            ],
+            'draggable' => true
+        ];
+
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'map' => $mapData
+            ]
+        ]);
+    }
+
     public function public_maps()
     {
         return view('maps.index');
     }
     public function index(Request $request)
     {
-        $maps = Maps::all();
+        // Ambil nilai 'perPage' dari query string, defaultnya 5
+        $perPage = $request->input('perPage', 5);
+
+        // Ambil nilai 'search' dari query string untuk pencarian
+        $search = $request->input('search');
+
+        // Kueri database berdasarkan pencarian dan jumlah data per halaman
+        if ($search) {
+            $maps = Maps::where('title', 'like', '%' . $search . '%')->paginate($perPage);
+        } else {
+            if ($perPage === 'all') {
+                $maps = Maps::all();
+            } else {
+                $maps = Maps::paginate($perPage);
+            }
+        }
         $title = 'Maps';
-        return view('admin.maps.index', compact('title', 'maps'));
+        return view('admin.maps.index', compact('title', 'maps', 'perPage', 'search'));
     }
 
     /**
@@ -131,9 +180,34 @@ class MapsController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
+
     public function edit(string $id)
     {
-        //
+        $title = 'Edit Maps';
+        $maps = Maps::find($id);
+
+        if (!$maps) {
+            // Tambahkan pesan log jika data tidak ditemukan
+            \Log::error('Data peta dengan ID ' . $id . ' tidak ditemukan.');
+            // Mungkin Anda ingin mengembalikan pesan kesalahan atau mengarahkan ke halaman lain di sini
+        }
+
+        // Mengambil data peta dalam format yang sesuai
+        $initialMarkers = [
+            [
+                'position' => [
+                    'id' => $maps->id,
+                    'lat' => $maps->lat,
+                    'lng' => $maps->lng,
+                    'title' => $maps->title,
+                    'description' => $maps->description,
+                    'image' => $maps->image
+                ],
+                'draggable' => true
+            ]
+        ];
+        // dd($initialMarkers);
+        return view('admin.maps.edit', compact('title', 'maps', 'initialMarkers'));
     }
 
     /**

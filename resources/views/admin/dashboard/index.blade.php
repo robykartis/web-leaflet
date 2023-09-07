@@ -1,74 +1,116 @@
 @extends('admin.layouts.app')
 @section('title')
-{{ $title }}
+    {{ $title }}
 @endsection
 @section('breadcrumbs')
-{{ Breadcrumbs::render() }}
+    {{ Breadcrumbs::render() }}
 @endsection
 @section('content')
-<section>
-    <div class="flex flex-wrap">
-        <div class="w-full md:w-1/2 xl:w-full p-3">
-            <div class="stats shadow">
-                <div class="stat">
-                    <div class="stat-title">Total Page Views</div>
-                    <div class="stat-value">89,400</div>
-                    <div class="stat-desc">21% more than last month</div>
+    <section>
+        <div class="justify-center items-center ">
+            <div class="flex flex-wrap">
+                <div class="w-full md:w-1/2 xl:w-full p-3">
+                    <div class="bg-white rounded-lg  text-center shadow">
+                        <div class="stat">
+                            <div class="stat-title font-bold text-gray-900">Total Mark</div>
+                            <div class="stat-value">{{ $total }}</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<!--Divider-->
-<hr class="border-b-2 border-gray-400 my-8 mx-4">
+    <!--Divider-->
+    <hr class="border-b-2 border-gray-400 my-8 mx-4">
 
-<div class="flex flex-row flex-wrap flex-grow mt-2">
-    <div class="w-full p-3">
-        <!--Table Card-->
-        <div class="card w-full bg-base-100 shadow-xl  mb-11">
-            <div class="card-body">
-                <h2 class="card-title">Data Maps</h2>
-                <div class="overflow-x-auto">
-                    <table class="table">
-                        <!-- head -->
-                        <thead>
-                            <tr>
-                                <th></th>
-                                <th>Name</th>
-                                <th>Job</th>
-                                <th>Favorite Color</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- row 1 -->
-                            <tr class="bg-base-200">
-                                <th>1</th>
-                                <td>Cy Ganderton</td>
-                                <td>Quality Control Specialist</td>
-                                <td>Blue</td>
-                            </tr>
-                            <!-- row 2 -->
-                            <tr>
-                                <th>2</th>
-                                <td>Hart Hagerty</td>
-                                <td>Desktop Support Technician</td>
-                                <td>Purple</td>
-                            </tr>
-                            <!-- row 3 -->
-                            <tr>
-                                <th>3</th>
-                                <td>Brice Swyre</td>
-                                <td>Tax Accountant</td>
-                                <td>Red</td>
-                            </tr>
-                        </tbody>
-                    </table>
+    <section class="mb-20">
+        <div class="flex flex-row flex-wrap flex-grow mt-2">
+            <div class="w-full p-3">
+                <!--Table Card-->
+                <div class="card w-full bg-base-100 shadow-xl  mb-11">
+                    <div class="card-body">
+
+                        <div class="flex gap-6 mx-auto">
+                            <form method="GET" action="{{ route('maps.index') }}">
+                                <div class="mb-4">
+                                    <label for="perPage">Tampilkan Data:</label>
+                                    <select id="perPage" class="rounded-2xl focus:outline-none" name="perPage"
+                                        onchange="this.form.submit()">
+                                        <option value="5" {{ $perPage == 5 ? 'selected' : '' }}>5</option>
+                                        <option value="10" {{ $perPage == 10 ? 'selected' : '' }}>10</option>
+                                        <option value="50" {{ $perPage == 50 ? 'selected' : '' }}>50</option>
+                                        <option value="100" {{ $perPage == 100 ? 'selected' : '' }}>100</option>
+
+                                    </select>
+                                </div>
+                            </form>
+                            <form method="GET" action="{{ route('maps.index') }}">
+                                <div class="mb-4">
+                                    <label for="search">Cari Berdasarkan Title:</label>
+                                    <input class="rounded-2xl focus:outline-none" type="text" id="search"
+                                        name="search" value="{{ $search }}">
+                                    <button class="btn btn-accent btn-sm" type="submit">Cari</button>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="table">
+                                <!-- head -->
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Penanda</th>
+                                        <th>Deskripsi</th>
+                                        <th>Latitude</th>
+                                        <th>Longitude</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @php
+                                        $currentPage = $maps->currentPage();
+                                        $index = ($currentPage - 1) * $maps->perPage() + 1;
+                                    @endphp
+
+                                    @foreach ($maps as $map)
+                                        <tr>
+                                            <td class="font-bold">
+                                                {{ $index++ }}
+                                            </td>
+                                            <td>
+                                                <div class="flex items-center space-x-3">
+                                                    <div class="avatar">
+                                                        <div class="mask mask-squircle w-12 h-12">
+                                                            @if ($map->image)
+                                                                <img src="{{ asset('assets/image/mark/thumbnail/mark_' . $map->image) }}"
+                                                                    alt="Mark image" />
+                                                            @else
+                                                                <img src="{{ asset('assets/image/noimg.png') }}"
+                                                                    alt="No Image" />
+                                                            @endif
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <div class="font-bold">{{ $map->title }}</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                {{ $map->description }}
+                                            </td>
+                                            <td>{{ $map->lat }}</td>
+                                            <td>{{ $map->lng }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                            {{ $maps->links() }}
+                        </div>
+
+                    </div>
                 </div>
+                <!--/table Card-->
             </div>
         </div>
-        <!--/table Card-->
-    </div>
-</div>
-
+    </section>
 @endsection

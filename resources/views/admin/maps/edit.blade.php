@@ -31,7 +31,7 @@
                             <div class="form-control w-full md:w-1/2 lg:w-1/4">
                                 <label class="input-group input-group-vertical">
                                     <span>Nama Lokasi</span>
-                                    <input type="text" name="title" value="{{ old('title') }}"
+                                    <input type="text" name="title" value="{{ old('title', $maps->title) }}"
                                         placeholder="Nama Lokasi"
                                         class="input input-accent input-bordered  @error('title') is-invalid @enderror" />
                                     @error('title')
@@ -42,7 +42,7 @@
                             <div class="form-control w-full md:w-1/2 lg:w-1/4">
                                 <label class="input-group input-group-vertical">
                                     <span>Latitude</span>
-                                    <input type="text" id="latInput" name="lat" value="{{ old('lat') }}"
+                                    <input type="text" id="latInput" name="lat" value="{{ old('lat', $maps->lat) }}"
                                         placeholder="Latitude"
                                         class="input input-accent input-bordered @error('lat') is-invalid @enderror" />
                                     @error('lat')
@@ -53,7 +53,7 @@
                             <div class="form-control w-full md:w-1/2 lg:w-1/4">
                                 <label class="input-group input-group-vertical">
                                     <span>Longitude</span>
-                                    <input type="text" id="lngInput" name="lng" value="{{ old('lng') }}"
+                                    <input type="text" id="lngInput" name="lng" value="{{ old('lng', $maps->lng) }}"
                                         placeholder="Longitude"
                                         class="input input-accent input-bordered @error('lng') is-invalid @enderror" />
                                     @error('lng')
@@ -78,7 +78,7 @@
                             <label class="input-group input-group-vertical">
                                 <span>Deskripsi</span>
                                 <textarea name="description" class="textarea textarea-accent @error('description') is-invalid @enderror"
-                                    placeholder="Deskripsi">{{ old('description') }}</textarea>
+                                    placeholder="Deskripsi">{{ old('description', $maps->description) }}</textarea>
                                 @error('description')
                                     <p class="text-red-600 text-sm">{{ $message }}</p>
                                 @enderror
@@ -105,6 +105,7 @@
     <script src="https://cdn.jsdelivr.net/npm/leaflet.fullscreen@2.4.0/Control.FullScreen.min.js"></script>
     <script>
         let map, markers = [];
+
         /* ----------------------------- Initialize Map ----------------------------- */
         function initMap() {
             map = L.map('map', {
@@ -122,11 +123,8 @@
             map.on('click', mapClicked);
             initMarkers();
         }
-        initMap();
 
-
-
-        /* --------------------------- Drak Markers --------------------------- */
+        /* --------------------------- Drag Markers --------------------------- */
         function updateLatLngInputs(marker) {
             const latInput = document.querySelector('input[name="lat"]');
             const lngInput = document.querySelector('input[name="lng"]');
@@ -135,24 +133,33 @@
             latInput.value = latLng.lat.toFixed(7); // Menggunakan toFixed untuk membatasi jumlah desimal.
             lngInput.value = latLng.lng.toFixed(7);
         }
+
         /* --------------------------- Initialize Markers --------------------------- */
         function initMarkers() {
-            const initialMarkers = <?php echo json_encode($initialMarkers); ?>;
+            const initialMarkers = {!! json_encode($initialMarkers) !!};
 
-            for (let index = 0; index < initialMarkers.length; index++) {
-                const data = initialMarkers[index];
+            initialMarkers.forEach((data, index) => {
                 const marker = generateMarker(data, index);
 
-                marker.addTo(map).bindPopup(`<b>${data.position.lat},  ${data.position.lng}</b>`);
+                marker.addTo(map).bindPopup(`
+                
+                <figure class="px-0 pt-0">
+                    <img src="assets/image/mark/thumbnail/mark_${data.position.image}" alt="Shoes" class="rounded-xl" />
+                </figure>
+                <h2 class="card-title">${data.position.title}</h2>
+                    <p>${data.position.description}</p>
+                    <p>${data.position.id}</p>`);
                 map.panTo(data.position);
-                markers.push(marker);
 
                 marker.on('dragend', (event) => {
                     updateLatLngInputs(event.target);
                     markerDragEnd(event, index);
                 });
-            }
+
+                markers.push(marker);
+            });
         }
+
 
         function generateMarker(data, index) {
             return L.marker(data.position, {
@@ -163,32 +170,25 @@
 
         /* ------------------------- Handle Map Click Event ------------------------- */
         function mapClicked($event) {
-            console.log(map);
-            console.log($event.latlng.lat, $event.latlng.lng);
+            console.log('Klik pada peta:', $event.latlng.lat, $event.latlng.lng);
         }
 
         /* ------------------------ Handle Marker Click Event ----------------------- */
         function markerClicked($event, index) {
-            console.log(map);
-            console.log($event.latlng.lat, $event.latlng.lng);
+            console.log('Klik pada marker:', $event.latlng.lat, $event.latlng.lng);
         }
 
         /* ----------------------- Handle Marker DragEnd Event ---------------------- */
         function markerDragEnd($event, index) {
-            console.log(map);
-            console.log($event.target.getLatLng());
+            console.log('Marker telah digeser:', $event.target.getLatLng());
         }
+
         /* ----------------------------- Fetch Map Data ----------------------------- */
-        function fetchMapData() {
-            fetch('/api/maps') // Ganti dengan URL yang sesuai dengan rute API Anda.
-                .then(response => response.json())
-                .then(data => {
-                    const initialMarkers = data.data.initialMarkers.position;
-                    initMarkers(initialMarkers); // Panggil fungsi initMarkers dengan data yang diambil dari API.
-                })
-                .catch(error => {
-                    console.error('Gagal mengambil data peta:', error);
-                });
-        }
+        // Kode ini seharusnya tidak diperlukan di sini karena Anda sudah menginisialisasi marker dengan data awal.
+
+        // Panggil initMap setelah halaman dimuat.
+        window.addEventListener('load', function() {
+            initMap();
+        });
     </script>
 @endpush

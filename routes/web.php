@@ -6,18 +6,6 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MapsController;
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
-*/
-
-
 
 
 Route::controller(AuthController::class)->group(function () {
@@ -29,8 +17,11 @@ Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard
 
 Route::controller(MapsController::class)->group(function () {
     Route::get('/', 'public_maps')->name('home');
-    Route::get('/api/maps', 'get_maps');
+    Route::get('/api/maps/{id}', 'get_map_by_id')->name('maps.get_map_by_id');
+    Route::get('/api/maps', 'get_maps')->name('get_maps');
     Route::get('/maps', 'index')->name('maps.index');
+    Route::get('/maps/edit/{id}', 'edit')->name('maps.edit');
     Route::get('/maps/create', 'create')->name('maps.create');
     Route::post('/maps/store', 'store')->name('maps.store');
+    Route::put('/maps/update/{id}', 'update')->name('maps.update');
 });
