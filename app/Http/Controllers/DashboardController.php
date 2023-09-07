@@ -13,7 +13,7 @@ class DashboardController extends Controller
     }
     public function index(Request $request)
     {
-        $title = 'Dashboard';
+        $title = 'Beranda';
 
         // Ambil nilai 'perPage' dari query string, defaultnya 5
         $perPage = $request->input('perPage', 5);

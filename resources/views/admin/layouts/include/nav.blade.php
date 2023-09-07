@@ -4,7 +4,7 @@
         <ul class="flex gap-2">
             <li>
                 <a href="{{ route('dashboard') }}"
-                    class="btn btn-ghost @if(request()->routeIs('dashboard')) font-bold @endif">Dashboard</a>
+                    class="btn btn-ghost @if(request()->routeIs('dashboard')) font-bold @endif">Beranda</a>
             </li>
             <li>
                 <a href="{{ route('maps.index') }}"
@@ -20,7 +20,7 @@
                         {{Auth::user()->name}}
                     </summary>
                     <ul class="p-2 bg-base-100">
-                        <li><a href="{{ route('logout') }}" class="btn btn-error btn-sm">Logout</a></li>
+                        <li><a href="{{ route('logout') }}" class="btn btn-error btn-sm">Keluar</a></li>
 
                     </ul>
                 </details>

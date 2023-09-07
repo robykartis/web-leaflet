@@ -1,7 +1,17 @@
 @extends('layouts.main')
 
+@push('css')
+<style>
+    .custom-popup-image {
+        width: 100%;
+        /* Ukuran lebar maksimum dalam kontainer popup */
+        height: auto;
+        /* Menjaga proporsi aspek gambar */
+        max-width: none;
+    }
+</style>
+@endpush
 @section('content')
-
 <section>
     <div class="flex flex-row flex-wrap flex-grow p-2">
         <div class="w-full p-3">
@@ -48,24 +58,30 @@
 
     /* --------------------------- Initialize Markers --------------------------- */
     function initMarkers(data) {
-        for (let index = 0; index < data.length; index++) {
-            const markerData = data[index];
-            const marker = generateMarker(markerData, index);
-            marker.addTo(map).bindPopup(`
-            <figure class="px-0 pt-0">
-                    <img src="assets/image/mark/thumbnail/mark_${markerData.position.image}" alt="Shoes" class="rounded-xl" />
-                </figure>
-                <h2 class="card-title">${markerData.position.title}</h2>
-                    <p>${markerData.position.description}</p>
-            `);
-            map.panTo(markerData.position);
-            markers.push(marker);
-        }
+    for (let index = 0; index < data.length; index++) {
+        const markerData = data[index];
+        const marker = generateMarker(markerData, index);
+        marker.on('mouseover', () => {
+            marker.openPopup();
+        });
+        marker.on('mouseout', () => {
+            marker.closePopup();
+        });
+        marker.addTo(map)
+        marker.bindPopup(`
+            <img src="assets/image/mark/${markerData.position.image}" alt="Shoes" class="rounded-xl custom-popup-image" />
+            <h2 class="card-title">${markerData.position.title}</h2>
+            <p>${markerData.position.description}</p>
+        `);
+
+        map.panTo(markerData.position);
+        markers.push(marker);
     }
+}
 
     function generateMarker(data, index) {
         return L.marker(data.position, {
-            draggable: data.draggable
+            draggable: false 
         })
             .on('click', (event) => markerClicked(event, index))
             .on('dragend', (event) => markerDragEnd(event, index));

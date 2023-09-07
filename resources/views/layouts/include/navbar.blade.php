@@ -4,14 +4,14 @@
     </div>
     <div class="flex-none">
         @if (Route::has('login'))
-            <ul class="menu menu-horizontal px-1">
-                @auth
-                    <li><a class="btn btn-outline btn-accent btn-sm" href="{{ route('dashboard') }}">Dashboard</a></li>
-                @else
-                    <li><a class="btn btn-outline btn-accent btn-sm" href="{{ route('login') }}">Login</a></li>
+        <ul class="menu menu-horizontal px-1">
+            @auth
+            <li><a class="btn btn-outline btn-accent btn-sm" href="{{ route('dashboard') }}">Beranda</a></li>
+            @else
+            <li><a class="btn btn-outline btn-accent btn-sm" href="{{ route('login') }}">Login</a></li>
 
-                @endauth
-            </ul>
+            @endauth
+        </ul>
         @endif
     </div>
 </div>

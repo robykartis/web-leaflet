@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Maps;
-use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Http\Request;
 use Intervention\Image\Facades\Image;
 use Illuminate\Support\Facades\Validator;
@@ -98,7 +97,7 @@ class MapsController extends Controller
                 $maps = Maps::paginate($perPage);
             }
         }
-        $title = 'Maps';
+        $title = 'Penanda';
         return view('admin.maps.index', compact('title', 'maps', 'perPage', 'search'));
     }
 
@@ -107,7 +106,7 @@ class MapsController extends Controller
      */
     public function create()
     {
-        $title = 'Add Mark';
+        $title = 'Tambah Penanda';
         $initialMarkers = [
             [
                 'position' => [
@@ -160,7 +159,7 @@ class MapsController extends Controller
             $map->lng = $request->lng;
             $map->image = $file_name;
             $map->save();
-            toastr()->success('Berhasil Menambahkan Maps ', 'SUCCESS', ['timeOut' => 5000]);
+            toastr()->success('Berhasil Menambahkan Penanda ', 'SUCCESS', ['timeOut' => 5000]);
             return redirect()->route('maps.index');
         } catch (\Illuminate\Database\QueryException $e) {
             if ($e->errorInfo[1] == 1062) {
@@ -215,7 +214,52 @@ class MapsController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'title' => 'required',
+            'description' => 'required',
+            'lat' => 'required',
+            'lng' => 'required',
+            'image' => 'sometimes|image|mimes:jpeg,png,jpg,gif,svg|max:8048',
+        ], [
+            'title.required' => 'Title tidak boleh kosong',
+            'description.required' => 'Description tidak boleh kosong',
+            'lat.required' => 'Latitude tidak boleh kosong',
+            'lng.required' => 'Longitude tidak boleh kosong',
+            'image.required' => 'Image tidak boleh kosong',
+            'image.image' => 'Image harus berupa gambar',
+            'image.mimes' => 'Image harus berupa jpeg,png,jpg,gif,svg',
+            'image.max' => 'Image maksimal 8MB',
+        ]);
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+        try {
+            $map = Maps::findOrFail($id);
+            if ($request->hasFile('image')) {
+                $map->delete_image();
+                $image = $request->file('image');
+                $file_name = rand(1000, 9999) . $image->getClientOriginalName();
+                $img = Image::make($image->path());
+                $img->resize('760', '760')
+                    ->save(public_path('assets/image/mark/thumbnail') . '/mark_' . $file_name);
+                $image->move(public_path('assets/image/mark'), $file_name);
+                $map->image = $file_name;
+            }
+
+            $map->title = $request->title;
+            $map->description = $request->description;
+            $map->lat = $request->lat;
+            $map->lng = $request->lng;
+            $map->update();
+            toastr()->success('Berhasil Update Penanda ', 'SUCCESS', ['timeOut' => 5000]);
+            return redirect()->route('maps.index');
+        } catch (\Illuminate\Database\QueryException $e) {
+            if ($e->errorInfo[1] == 1062) {
+                return back()->with('error', 'Email Sudah Terdaftar')->withInput();
+            }
+        }
     }
 
     /**
@@ -223,6 +267,15 @@ class MapsController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        try {
+            $map = Maps::find($id);
+            $map->delete_image();
+            $map->delete();
+            toastr()->success('Berhasil Hapus Penanda ', 'SUCCESS', ['timeOut' => 5000]);
+            return redirect()->route('maps.index');
+        } catch (\Throwable $th) {
+            toastr()->error('Gagal Hapus Penanda ', 'SUCCESS', ['timeOut' => 5000]);
+            return redirect()->route('maps.index');
+        }
     }
 }
